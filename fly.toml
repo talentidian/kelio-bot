@@ -1,0 +1,19 @@
+app = "kelio-bot"
+primary_region = "cdg"
+
+[build]
+
+[env]
+  TZ = "Europe/Madrid"
+  KELIO_DATA_DIR = "/data"
+  KELIO_URL = "https://signify.kelio.io/open/homepage?ACTION=intranet&asked=1&header=0"
+  KELIO_LAT = "40.4392"
+  KELIO_LON = "-3.6485"
+
+[mounts]
+  source = "kelio_data"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"

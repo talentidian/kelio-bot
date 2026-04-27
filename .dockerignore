@@ -1,0 +1,11 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+storage_state.json
+.env
+README.md
+setup_local.ps1
+.fly

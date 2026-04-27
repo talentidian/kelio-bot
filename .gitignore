@@ -1,0 +1,11 @@
+storage_state.json
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.fly/
+.DS_Store
+*.log
+*.png
+fly_deploy*.log

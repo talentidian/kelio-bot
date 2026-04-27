@@ -1,0 +1,4 @@
+30 8  * * 1-4  cd /app && python kelio_clock.py --action in
+0  18 * * 1-4  cd /app && python kelio_clock.py --action out
+30 8  * * 5    cd /app && python kelio_clock.py --action in
+0  14 * * 5    cd /app && python kelio_clock.py --action out
