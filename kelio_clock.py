@@ -116,8 +116,14 @@ def run_punch(action: str, dry_run: bool = False) -> int:
             except Exception:
                 pass
             log(f"punch {action} OK")
-
             ctx.storage_state(path=str(STATE_FILE))
+            now_str = datetime.now(TZ).strftime("%H:%M:%S")
+            notify.post(
+                f"Kelio {action} {now_str}",
+                f"punch {action} OK at {now_str}",
+                priority="min",
+                tags="white_check_mark",
+            )
             return 0
         except Exception as e:
             log(f"ERROR during {action}: {e}")
