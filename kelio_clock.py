@@ -13,6 +13,7 @@ from playwright.sync_api import sync_playwright
 
 from holidays_check import is_madrid_holiday
 from pto import is_pto_or_sick
+import notify
 
 DATA_DIR = Path(os.environ.get("KELIO_DATA_DIR", "/data"))
 STATE_FILE = DATA_DIR / "storage_state.json"
@@ -45,6 +46,23 @@ def jitter_sleep() -> None:
     delay = random.uniform(30, 90)
     log(f"jitter sleep {delay:.1f}s")
     time.sleep(delay)
+
+
+def maybe_warn_aging_auth() -> None:
+    if not STATE_FILE.exists():
+        return
+    now = datetime.now(TZ)
+    if now.weekday() != 0 or now.hour > 9:
+        return
+    age_days = (time.time() - STATE_FILE.stat().st_mtime) / 86400
+    if age_days < 50:
+        return
+    notify.post(
+        "Kelio auth aging",
+        f"storage_state.json is {age_days:.0f} days old. Run /kelio reauth before it expires.",
+        priority="default",
+        tags="hourglass",
+    )
 
 
 def run_punch(action: str, dry_run: bool = False) -> int:
@@ -130,10 +148,28 @@ def main():
             log(f"skipping: {reason}")
             return 0
 
+    maybe_warn_aging_auth()
+
     if not args.no_jitter and not args.dry_run:
         jitter_sleep()
 
-    return run_punch(args.action, dry_run=args.dry_run)
+    result = run_punch(args.action, dry_run=args.dry_run)
+    if result != 0 and not args.dry_run:
+        if result == 3:
+            notify.post(
+                "Kelio auth EXPIRED",
+                f"Punch {args.action} failed: SSO session expired. Run /kelio reauth.",
+                priority="high",
+                tags="rotating_light",
+            )
+        else:
+            notify.post(
+                f"Kelio punch {args.action} FAILED",
+                f"exit={result}. Check logs: flyctl logs -a kelio-bot",
+                priority="high",
+                tags="warning",
+            )
+    return result
 
 
 if __name__ == "__main__":

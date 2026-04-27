@@ -21,7 +21,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY holidays_check.py pto.py kelio_clock.py crontab entrypoint.sh ./
+COPY holidays_check.py pto.py kelio_clock.py notify.py crontab entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 
 CMD ["./entrypoint.sh"]
